@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hawknewton/rspec-eventually.svg?branch=master)](https://travis-ci.org/hawknewton/rspec-eventually)
+
 # Rspec::Eventually
 
 I want to be able to do something like this:
