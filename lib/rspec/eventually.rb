@@ -1,5 +1,5 @@
 require 'rspec/eventually/version'
-require 'rspec'
+require 'rspec/core'
 
 module Rspec
   module Eventually
