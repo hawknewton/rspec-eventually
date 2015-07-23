@@ -39,10 +39,6 @@ Or install it yourself as:
 
     $ gem install rspec-eventually
 
-## Usage
-
-TODO: Write usage instructions here
-
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/rspec-eventually/fork )
