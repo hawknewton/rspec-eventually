@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hawknewton/rspec-eventually.svg?branch=master)](https://travis-ci.org/hawknewton/rspec-eventually)
+[![Build Status](https://travis-ci.org/hawknewton/rspec-eventually.svg?branch=master)](https://travis-ci.org/hawknewton/rspec-eventually) [![Gem Version](https://badge.fury.io/rb/rspec-eventually.svg)](http://badge.fury.io/rb/rspec-eventually)
 # Rspec::Eventually
 
 I want to be able to do something like this:
