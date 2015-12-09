@@ -15,10 +15,11 @@ module Rspec
         tap { @suppress_errors = true }
       end
 
-      def initialize(target)
+      def initialize(target, custom_msg = nil)
         @target = target
         @tries = 0
         @negative = false
+        @custom_msg = custom_msg
       end
 
       def matches?(expected_block)
@@ -32,7 +33,8 @@ module Rspec
       end
 
       def failure_message
-        "After #{@tries} tries, the last failure message was:\n#{@target.failure_message}"
+        msg = @custom_msg || @target.failure_message
+        "After #{@tries} tries, the last failure message was:\n#{msg}"
       end
 
       def not
@@ -75,12 +77,12 @@ module Rspec
       end
     end
 
-    def eventually(target)
-      Eventually.new target
+    def eventually(target, custom_msg = nil)
+      Eventually.new(target, custom_msg)
     end
 
-    def eventually_not(target)
-      Eventually.new(target).not
+    def eventually_not(target, custom_msg = nil)
+      Eventually.new(target, custom_msg).not
     end
 
     RSpec.configure do |config|

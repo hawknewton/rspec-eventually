@@ -97,6 +97,13 @@ module Rspec
 
         expect { block.call }.to raise_error(/Timeout before first evaluation/)
       end
+
+      it 'supports custom error messages' do
+        (matcher = Eventually.new(eq(1), '0 is not within 0.5 of 1').within(0.5)).matches? -> { 0 }
+        message = matcher.failure_message
+        expect(message).to match(/After [0-9]+ tries, the last failure message was/)
+        expect(message).to match(/0 is not within 0.5 of 1/)
+      end
     end
   end
 end
