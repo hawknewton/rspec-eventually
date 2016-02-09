@@ -4,9 +4,10 @@ require 'rspec/core'
 module Rspec
   module Eventually
     class << self
-      attr_accessor :timeout
+      attr_accessor :timeout, :pause
     end
     self.timeout = 5
+    self.pause = 0.1
 
     class FailedMatcherError < StandardError; end
 
@@ -20,12 +21,14 @@ module Rspec
         @tries = 0
         @negative = false
         @custom_msg = custom_msg
+        @pause = pause
       end
 
       def matches?(expected_block)
         Timeout.timeout(timeout) { eventually_matches? expected_block }
       rescue Timeout::Error
-        @tries == 0 && raise('Timeout before first evaluation, use a longer `eventually` timeout')
+        @tries == 0 && raise('Timeout before first evaluation, use a longer `eventually` timeout \
+          or shorter `eventually` pause')
       end
 
       def does_not_match?
@@ -53,13 +56,17 @@ module Rspec
         tap { @timeout = timeout }
       end
 
+      def pause_for(pause)
+        tap { @pause = pause }
+      end
+
       private
 
       def eventually_matches?(expected_block)
         target_matches?(expected_block) || fail(FailedMatcherError)
       rescue => e
         if suppress_errors || e.is_a?(FailedMatcherError)
-          sleep 0.1
+          sleep pause
           @tries += 1
           retry
         else
@@ -74,6 +81,10 @@ module Rspec
 
       def timeout
         @timeout || Rspec::Eventually.timeout
+      end
+
+      def pause
+        @pause || Rspec::Eventually.pause
       end
     end
 
