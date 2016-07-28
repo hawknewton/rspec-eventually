@@ -20,6 +20,9 @@ I want to be able to do something like this:
     # Change the timeout
     expect { client.get 'ZYX' }.to eventually(eq 1).within 5
 
+    # Change the pause between retries
+    expect { client.get 'ZYX' }.to eventually(eq 1).pause_for 1.5
+
   end
 ```
 
