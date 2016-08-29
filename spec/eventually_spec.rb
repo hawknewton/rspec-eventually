@@ -51,6 +51,45 @@ module Rspec
         expect(took).to be_within(0.1).of 0.5
       end
 
+      it 'has a configurable default pause' do
+        begin
+          ::Rspec::Eventually.pause = 0.5
+          expect(::Rspec::Eventually.pause).to eq 0.5
+
+          matcher = Eventually.new(eq 1)
+          matcher.matches? -> { 0 }
+
+          expect(matcher.instance_variable_get('@tries')).to eq 9
+
+        ensure
+          ::Rspec::Eventually.pause = 0.1
+        end
+      end
+
+      it 'can have a specific pause' do
+        matcher = Eventually.new(eq 1)
+        matcher.pause_for(1.5).matches? -> { 0 }
+
+        expect(matcher.instance_variable_get('@tries')).to eq 3
+      end
+
+      it 'can have a specific pause and timeout' do
+        matcher = Eventually.new(eq 1)
+        matcher.pause_for(1).within(3).matches? -> { 0 }
+
+        expect(matcher.instance_variable_get('@tries')).to eq 2
+      end
+
+      it 'it will not pause when evaluation is true' do
+        before = Time.now
+        matcher = Eventually.new(eq 1)
+        matcher.pause_for(1).matches? -> { 1 }
+        took = Time.now - before
+
+        expect(matcher.instance_variable_get('@tries')).to eq 0
+        expect(took).to be < 1
+      end
+
       it 'raises errors by default' do
         block = lambda do
           Eventually.new(eq 1).matches? -> { fail 'I am throwing an error' }
@@ -93,6 +132,14 @@ module Rspec
       it 'raises an error when timeout occurs before the first evaluation' do
         block = lambda do
           Eventually.new(eq 1).within(0.5).matches? -> { sleep 5 }
+        end
+
+        expect { block.call }.to raise_error(/Timeout before first evaluation/)
+      end
+
+      it 'raises an error when timeout occurs before the first evaluation due to long pause' do
+        block = lambda do
+          Eventually.new(eq 1).pause_for(1).within(0.5).matches? -> { sleep 5 }
         end
 
         expect { block.call }.to raise_error(/Timeout before first evaluation/)
