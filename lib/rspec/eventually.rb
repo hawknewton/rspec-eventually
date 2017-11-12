@@ -1,5 +1,6 @@
 require 'rspec/eventually/version'
 require 'rspec/core'
+require 'timeout'
 
 module Rspec
   module Eventually
@@ -12,6 +13,7 @@ module Rspec
     class FailedMatcherError < StandardError; end
 
     class Eventually
+      attr_reader :timeout, :pause, :suppress_errors
       def by_suppressing_errors
         tap { @suppress_errors = true }
       end
@@ -21,7 +23,9 @@ module Rspec
         @tries = 0
         @negative = false
         @custom_msg = custom_msg
-        @pause = pause
+        @timeout = Rspec::Eventually.timeout
+        @pause = Rspec::Eventually.pause
+        @suppress_errors = false
       end
 
       def matches?(expected_block)
@@ -32,7 +36,7 @@ module Rspec
       end
 
       def does_not_match?
-        fail 'Use eventually_not instead of expect(...).to_not'
+        raise 'Use eventually_not instead of expect(...).to_not'
       end
 
       def failure_message
@@ -48,10 +52,6 @@ module Rspec
         true
       end
 
-      def suppress_errors
-        @suppress_errors || false
-      end
-
       def within(timeout)
         tap { @timeout = timeout }
       end
@@ -63,28 +63,17 @@ module Rspec
       private
 
       def eventually_matches?(expected_block)
-        target_matches?(expected_block) || fail(FailedMatcherError)
-      rescue => e
-        if suppress_errors || e.is_a?(FailedMatcherError)
-          sleep pause
-          @tries += 1
-          retry
-        else
-          raise
-        end
+        target_matches?(expected_block) || raise(FailedMatcherError)
+      rescue StandardError => e
+        raise if !e.is_a?(FailedMatcherError) && !suppress_errors
+        sleep pause
+        @tries += 1
+        retry
       end
 
       def target_matches?(expected_block)
         result = @target.matches? expected_block.call
         @negative ? !result : result
-      end
-
-      def timeout
-        @timeout || Rspec::Eventually.timeout
-      end
-
-      def pause
-        @pause || Rspec::Eventually.pause
       end
     end
 
