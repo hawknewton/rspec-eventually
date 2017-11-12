@@ -36,7 +36,7 @@ module Rspec
       end
 
       def does_not_match?
-        raise 'Use eventually_not instead of expect(...).to_not'
+        fail 'Use eventually_not instead of expect(...).to_not'
       end
 
       def failure_message
@@ -63,7 +63,7 @@ module Rspec
       private
 
       def eventually_matches?(expected_block)
-        target_matches?(expected_block) || raise(FailedMatcherError)
+        target_matches?(expected_block) || fail(FailedMatcherError)
       rescue StandardError => e
         raise if !e.is_a?(FailedMatcherError) && !suppress_errors
         sleep pause
