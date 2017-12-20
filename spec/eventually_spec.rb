@@ -1,7 +1,6 @@
 module Rspec
   module Eventually
     describe Eventually do
-
       it 'eventually matches' do
         value = 0
         Thread.new do
@@ -9,7 +8,7 @@ module Rspec
           value = 1
         end
 
-        expect(Eventually.new(eq 1).matches? -> { value }).to be true
+        expect(Eventually.new(eq 1).matches?(-> { value })).to be true
       end
 
       it 'eventually_not matches' do
@@ -19,15 +18,15 @@ module Rspec
           value = 1
         end
 
-        expect(Eventually.new(eq 0).not.matches? -> { value }).to be true
+        expect(Eventually.new(eq 0).not.matches?(-> { value })).to be true
       end
 
       it 'eventually fails' do
-        expect(Eventually.new(eq 1).matches? -> { 0 }).to be false
+        expect(Eventually.new(eq 1).matches?(-> { 0 })).to be false
       end
 
       it 'eventually_not fails' do
-        expect(Eventually.new(eq 1).not.matches? -> { 1 }).to be false
+        expect(Eventually.new(eq 1).not.matches?(-> { 1 })).to be false
       end
 
       it 'has a configurable default timeout' do
@@ -60,7 +59,6 @@ module Rspec
           matcher.matches? -> { 0 }
 
           expect(matcher.instance_variable_get('@tries')).to eq 9
-
         ensure
           ::Rspec::Eventually.pause = 0.1
         end
@@ -92,7 +90,7 @@ module Rspec
 
       it 'raises errors by default' do
         block = lambda do
-          Eventually.new(eq 1).matches? -> { fail 'I am throwing an error' }
+          Eventually.new(eq 1).matches? -> { raise 'I am throwing an error' }
         end
 
         expect { block.call }.to raise_error(/I am throwing an error/)
@@ -101,11 +99,10 @@ module Rspec
       it 'can suppress errors' do
         first = false
         block = lambda do
-
           one_eventually = lambda do
             if first
               first = false
-              fail 'I am throwing an error'
+              raise 'I am throwing an error'
             end
             1
           end

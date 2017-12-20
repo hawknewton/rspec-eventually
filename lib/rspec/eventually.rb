@@ -31,12 +31,12 @@ module Rspec
       def matches?(expected_block)
         Timeout.timeout(timeout) { eventually_matches? expected_block }
       rescue Timeout::Error
-        @tries == 0 && raise('Timeout before first evaluation, use a longer `eventually` timeout \
+        @tries.zero? && raise('Timeout before first evaluation, use a longer `eventually` timeout \
           or shorter `eventually` pause')
       end
 
       def does_not_match?
-        fail 'Use eventually_not instead of expect(...).to_not'
+        raise 'Use eventually_not instead of expect(...).to_not'
       end
 
       def failure_message
@@ -63,7 +63,7 @@ module Rspec
       private
 
       def eventually_matches?(expected_block)
-        target_matches?(expected_block) || fail(FailedMatcherError)
+        target_matches?(expected_block) || raise(FailedMatcherError)
       rescue StandardError => e
         raise if !e.is_a?(FailedMatcherError) && !suppress_errors
         sleep pause
