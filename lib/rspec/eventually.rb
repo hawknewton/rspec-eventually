@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rspec/eventually/version'
 require 'rspec/core'
 require 'timeout'
@@ -14,6 +16,7 @@ module Rspec
 
     class Eventually
       attr_reader :timeout, :pause, :suppress_errors
+
       def by_suppressing_errors
         tap { @suppress_errors = true }
       end
@@ -66,6 +69,7 @@ module Rspec
         target_matches?(expected_block) || raise(FailedMatcherError)
       rescue StandardError => e
         raise if !e.is_a?(FailedMatcherError) && !suppress_errors
+
         sleep pause
         @tries += 1
         retry
